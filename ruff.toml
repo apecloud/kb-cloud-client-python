@@ -9,6 +9,7 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
+"src/kb_cloud_client/__init__.py" = ["I001"]   # intentional export ordering
 "src/kb_cloud_client/kbcloud/**" = ["F401", "F403", "E402"]  # generated
 
 [format]

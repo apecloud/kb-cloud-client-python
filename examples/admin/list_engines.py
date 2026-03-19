@@ -1,4 +1,5 @@
 """Example: List all available database engines and their versions (admin portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration
@@ -17,8 +18,11 @@ def main():
     with ApiClient(configuration) as api_client:
         engine_api = EngineApi(api_client)
 
-        print("Fetching all engines (admin view)" +
-              (f" (filter: name={engine_name})" if engine_name else "") + "...")
+        print(
+            "Fetching all engines (admin view)"
+            + (f" (filter: name={engine_name})" if engine_name else "")
+            + "..."
+        )
 
         result = engine_api.list_all_engines(name=engine_name)
 
@@ -35,8 +39,9 @@ def main():
             ver_str = ", ".join(str(getattr(v, "version", v)) for v in versions[:5])
             if len(versions) > 5:
                 ver_str += f" ... (+{len(versions) - 5} more)"
-            print(f"  - {name}  type={engine_type}" +
-                  (f"  versions=[{ver_str}]" if ver_str else ""))
+            print(
+                f"  - {name}  type={engine_type}" + (f"  versions=[{ver_str}]" if ver_str else "")
+            )
 
 
 if __name__ == "__main__":

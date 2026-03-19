@@ -1,4 +1,5 @@
 """Example: List all environments, optionally filtered by org or cloud provider (admin portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration
@@ -18,9 +19,12 @@ def main():
     with ApiClient(configuration) as api_client:
         env_api = EnvironmentApi(api_client)
 
-        print("Fetching environments" +
-              (f" for org '{org_name}'" if org_name else "") +
-              (f" on provider '{cloud_provider}'" if cloud_provider else "") + "...")
+        print(
+            "Fetching environments"
+            + (f" for org '{org_name}'" if org_name else "")
+            + (f" on provider '{cloud_provider}'" if cloud_provider else "")
+            + "..."
+        )
 
         result = env_api.list_environment(
             org_name=org_name,

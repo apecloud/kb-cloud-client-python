@@ -1,4 +1,5 @@
 """Example: List all clusters in an organization (user portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration

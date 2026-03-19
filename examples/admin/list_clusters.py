@@ -1,4 +1,5 @@
 """Example: List all clusters in an org with optional filters (admin portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration
@@ -13,14 +14,17 @@ def main():
     )
 
     org_name = os.environ.get("KB_CLOUD_ORG", "my-org")
-    engine_filter = os.environ.get("KB_CLOUD_ENGINE")         # e.g. "postgresql"
-    environment_name = os.environ.get("KB_CLOUD_ENV_NAME")    # e.g. "production"
+    engine_filter = os.environ.get("KB_CLOUD_ENGINE")  # e.g. "postgresql"
+    environment_name = os.environ.get("KB_CLOUD_ENV_NAME")  # e.g. "production"
 
     with ApiClient(configuration) as api_client:
         cluster_api = ClusterApi(api_client)
 
-        print(f"Listing clusters in org '{org_name}' (admin view)" +
-              (f", engine={engine_filter}" if engine_filter else "") + "...")
+        print(
+            f"Listing clusters in org '{org_name}' (admin view)"
+            + (f", engine={engine_filter}" if engine_filter else "")
+            + "..."
+        )
 
         result = cluster_api.list_cluster(
             org_name=org_name,

@@ -1,8 +1,9 @@
 """Example: Create, read, and delete an organization (admin portal)."""
+
 import os
 import sys
 
-from kb_cloud_client import ApiClient, Configuration, ApiException
+from kb_cloud_client import ApiClient, ApiException, Configuration
 from kb_cloud_client.kbcloud.admin import OrganizationApi
 from kb_cloud_client.kbcloud.admin.model.org_create import OrgCreate
 

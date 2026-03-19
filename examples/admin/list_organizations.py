@@ -1,4 +1,5 @@
 """Example: List all organizations on the platform (admin portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration
@@ -28,8 +29,11 @@ def main():
             name = getattr(org, "name", "?")
             display_name = getattr(org, "display_name", "")
             status = getattr(org, "status", "")
-            print(f"  - {name}" + (f" ({display_name})" if display_name else "") +
-                  (f"  [{status}]" if status else ""))
+            print(
+                f"  - {name}"
+                + (f" ({display_name})" if display_name else "")
+                + (f"  [{status}]" if status else "")
+            )
 
 
 if __name__ == "__main__":

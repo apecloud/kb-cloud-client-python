@@ -1,6 +1,9 @@
 """Tests for Configuration."""
+
 import os
+
 import pytest
+
 from kb_cloud_client import Configuration
 
 

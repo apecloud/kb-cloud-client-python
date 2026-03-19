@@ -1,4 +1,5 @@
 """Example: Get the currently authenticated user's information (admin portal)."""
+
 import os
 
 from kb_cloud_client import ApiClient, Configuration

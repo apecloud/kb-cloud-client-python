@@ -1,6 +1,8 @@
 """Tests for generated model deserialization / serialization."""
-import sys
+
 import os
+import sys
+
 import pytest
 
 # Ensure the src package is on the path when running tests directly
@@ -8,7 +10,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from kb_cloud_client.kbcloud.admin.model.organization_item import OrganizationItem
 from kb_cloud_client.kbcloud.admin.model.organization_list import OrganizationList
-
 
 RAW_ORG_ITEM = {
     "name": "acme",
@@ -35,6 +36,7 @@ def test_organization_item_from_dict():
 
 def test_organization_item_datetime_parsed():
     from datetime import timezone
+
     item = OrganizationItem.from_dict(RAW_ORG_ITEM)
     assert item.created_at is not None
     assert item.created_at.tzinfo == timezone.utc

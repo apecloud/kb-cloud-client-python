@@ -1,0 +1,16 @@
+line-length = 100
+
+[lint]
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",  # line too long – handled by formatter
+    "F401",  # unused import – generated code uses wildcard imports
+    "F403",  # star import – generated code
+]
+
+[lint.per-file-ignores]
+"src/kb_cloud_client/kbcloud/**" = ["F401", "F403", "E402"]  # generated
+
+[format]
+quote-style = "double"
+indent-style = "space"

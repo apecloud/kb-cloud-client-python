@@ -15,11 +15,13 @@ install:  ## Install the package in editable mode with dev extras
 test:  ## Run tests
 	pytest tests/ -v --tb=short
 
-lint:  ## Check code formatting (black --check)
-	black --check src/kb_cloud_client/*.py tests/ examples/
+lint:  ## Lint and check formatting (ruff)
+	ruff check src/kb_cloud_client/*.py tests/ examples/
+	ruff format --check src/kb_cloud_client/*.py tests/ examples/
 
-fmt:  ## Auto-format code with black
-	black src/kb_cloud_client/*.py tests/ examples/
+fmt:  ## Auto-format and fix code with ruff
+	ruff format src/kb_cloud_client/*.py tests/ examples/
+	ruff check --fix src/kb_cloud_client/*.py tests/ examples/
 
 typecheck:  ## Run mypy type checks
 	mypy src/kb_cloud_client/ --ignore-missing-imports

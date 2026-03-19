@@ -1,16 +1,18 @@
 """Tests for exception hierarchy."""
+
 import pytest
+
 from kb_cloud_client import (
-    OpenApiException,
+    ApiAttributeError,
     ApiException,
+    ApiKeyError,
     ApiTypeError,
     ApiValueError,
-    ApiAttributeError,
-    ApiKeyError,
-    NotFoundException,
-    UnauthorizedException,
     ForbiddenException,
+    NotFoundException,
+    OpenApiException,
     ServiceException,
+    UnauthorizedException,
 )
 from kb_cloud_client.exceptions import raise_from_response
 

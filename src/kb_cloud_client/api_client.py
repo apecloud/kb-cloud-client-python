@@ -25,6 +25,7 @@ T = TypeVar("T")
 # Sentinel for "parameter not provided" – mirrors DataDog's `unset`
 # ---------------------------------------------------------------------------
 
+
 class _Unset:
     """Sentinel singleton that distinguishes 'not provided' from ``None``."""
 
@@ -50,6 +51,7 @@ UnsetType = _Unset
 # Datetime helper
 # ---------------------------------------------------------------------------
 
+
 def _parse_datetime(value: Any) -> Any:
     """Parse an ISO-8601 datetime string, handling the ``Z`` UTC suffix (Python 3.10 compat)."""
     if not isinstance(value, str):
@@ -63,6 +65,7 @@ def _parse_datetime(value: Any) -> Any:
 # ---------------------------------------------------------------------------
 # Endpoint – declarative API operation descriptor (mirrors DataDog's pattern)
 # ---------------------------------------------------------------------------
+
 
 class Endpoint:
     """Encapsulates all metadata for a single API operation.
@@ -148,6 +151,7 @@ class Endpoint:
 # ApiClient
 # ---------------------------------------------------------------------------
 
+
 class ApiClient:
     """HTTP client for the KubeBlocks Cloud API.
 
@@ -203,12 +207,14 @@ class ApiClient:
             session.mount("http://", adapter)
             session.mount("https://", adapter)
 
-        session.headers.update({
-            "User-Agent": f"kb-cloud-client-python/{_VERSION}",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            **cfg.default_headers,
-        })
+        session.headers.update(
+            {
+                "User-Agent": f"kb-cloud-client-python/{_VERSION}",
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                **cfg.default_headers,
+            }
+        )
 
         return session
 

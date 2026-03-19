@@ -1,0 +1,10 @@
+[run]
+source = kb_cloud_client
+omit =
+    */kbcloud/api/*
+    */kbcloud/model/*
+    */kbcloud/admin/*
+
+[report]
+show_missing = true
+skip_covered = false

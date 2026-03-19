@@ -1,22 +1,26 @@
 """Tests for ApiClient internals (no network required)."""
+
 import json
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from kb_cloud_client import ApiClient, Configuration
 from kb_cloud_client.api_client import (
     Endpoint,
+    UnsetType,
     _deserialize_value,
     _parse_datetime,
     unset,
-    UnsetType,
 )
 from kb_cloud_client.exceptions import NotFoundException, UnauthorizedException
 
-
 # ── unset sentinel ────────────────────────────────────────────────────────────
+
 
 def test_unset_is_singleton():
     from kb_cloud_client.api_client import _Unset
+
     assert _Unset() is unset
 
 
@@ -34,8 +38,10 @@ def test_unset_type():
 
 # ── _parse_datetime ───────────────────────────────────────────────────────────
 
+
 def test_parse_datetime_z_suffix():
     from datetime import timezone
+
     dt = _parse_datetime("2026-03-11T07:15:02.582Z")
     assert dt.tzinfo == timezone.utc
     assert dt.year == 2026
@@ -53,30 +59,35 @@ def test_parse_datetime_invalid_string():
 
 # ── _deserialize_value ────────────────────────────────────────────────────────
 
+
 def test_deserialize_none():
     assert _deserialize_value(None, str) is None
 
 
 def test_deserialize_list():
     from typing import List
+
     result = _deserialize_value([1, 2, 3], List[int])
     assert result == [1, 2, 3]
 
 
 def test_deserialize_dict():
     from typing import Dict
+
     result = _deserialize_value({"a": 1}, Dict[str, int])
     assert result == {"a": 1}
 
 
 def test_deserialize_optional_present():
     from typing import Optional
+
     result = _deserialize_value("hello", Optional[str])
     assert result == "hello"
 
 
 def test_deserialize_optional_none():
     from typing import Optional
+
     result = _deserialize_value(None, Optional[str])
     assert result is None
 
@@ -94,6 +105,7 @@ def test_deserialize_model_via_from_dict():
 
 
 # ── ApiClient._sanitize_params ────────────────────────────────────────────────
+
 
 def test_sanitize_params_skips_none():
     cfg = Configuration()
@@ -119,6 +131,7 @@ def test_sanitize_params_multi():
 
 # ── ApiClient._serialize ──────────────────────────────────────────────────────
 
+
 def test_serialize_none():
     client = ApiClient(Configuration())
     assert client._serialize(None) is None
@@ -142,6 +155,7 @@ def test_serialize_model_with_to_dict():
 
 # ── ApiClient._build_url ──────────────────────────────────────────────────────
 
+
 def test_build_url_no_params():
     client = ApiClient(Configuration(host="https://api.example.com"))
     assert client._build_url("/v1/orgs") == "https://api.example.com/v1/orgs"
@@ -154,6 +168,7 @@ def test_build_url_with_path_params():
 
 
 # ── Endpoint.call_with_http_info ──────────────────────────────────────────────
+
 
 def _make_endpoint(api_client, path="/test", method="GET", response_type=None):
     return Endpoint(
@@ -168,7 +183,10 @@ def _make_endpoint(api_client, path="/test", method="GET", response_type=None):
             "page": {"location": "query", "attribute": "page"},
             "body": {"location": "body"},
         },
-        headers_map={"accept": ["application/json"], "content_type": ["application/json"]},
+        headers_map={
+            "accept": ["application/json"],
+            "content_type": ["application/json"],
+        },
         api_client=api_client,
     )
 

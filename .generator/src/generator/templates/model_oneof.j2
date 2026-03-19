@@ -1,0 +1,11 @@
+{% set oneof_key = "oneOf" if "oneOf" in model else "anyOf" %}
+# {{ name }} is a union type; instances may be any of the following types:
+{% for sub in model[oneof_key] %}
+{% set sub_type = type_to_python(sub) %}
+# - {{ sub_type }}
+{% endfor %}
+{{ name }} = Union[
+{% for sub in model[oneof_key] %}
+    {{ type_to_python(sub) }},
+{% endfor %}
+]

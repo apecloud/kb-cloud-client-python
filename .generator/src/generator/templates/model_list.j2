@@ -1,0 +1,6 @@
+{% set items = model.get("items", {}) %}
+{% set item_type_name = get_name(items) %}
+{% if item_type_name %}
+from .{{ item_type_name | model_filename }} import {{ item_type_name }}
+{% endif %}
+{{ name }} = List[{{ item_type_name or "Any" }}]

@@ -1,0 +1,35 @@
+{% include "partial_header.j2" %}
+from __future__ import annotations
+
+{% if "enum" in model %}
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+{% include "model_enum.j2" %}
+{% elif "oneOf" in model or "anyOf" in model %}
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+{% include "model_oneof.j2" %}
+{% elif model.get("type") == "array" %}
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+{% include "model_list.j2" %}
+{% else %}
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+from {{ pkg_import_prefix }}api_client import _parse_datetime  # noqa: F401 – used in generated from_dict
+
+{% set refs = get_model_references(model, name) %}
+{% for ref_name in refs | sort %}
+from .{{ ref_name | model_filename }} import {{ ref_name }}
+{% endfor %}
+
+{% include "model_normal.j2" %}
+{% endif %}

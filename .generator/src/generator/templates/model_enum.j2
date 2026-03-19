@@ -1,0 +1,19 @@
+{% set enum_type = "int" if model.get("type") == "integer" else "str" %}
+{% set base_class = "IntEnum" if model.get("type") == "integer" else "str, Enum" %}
+
+from enum import Enum
+
+
+class {{ name }}({{ base_class }}):
+    """{{ model.get("description", name) | replace('"', "'") | truncate(200) }}"""
+{% for value in model["enum"] %}
+{% if value is not none %}
+{% set raw = value | string %}
+{% set var_name = raw | upper | replace("-", "_") | replace(" ", "_") | replace(".", "_") | replace("/", "_") | replace("(", "") | replace(")", "") | replace(":", "_") %}
+{% if var_name and var_name[0].isdigit() %}
+    VALUE_{{ var_name }} = {{ value | tojson if enum_type == "str" else value }}
+{% elif var_name %}
+    {{ var_name }} = {{ value | tojson if enum_type == "str" else value }}
+{% endif %}
+{% endif %}
+{% endfor %}

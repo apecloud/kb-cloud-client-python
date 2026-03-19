@@ -1,0 +1,10 @@
+{% include "partial_header.j2" %}
+{% for model_name in models %}
+from .{{ model_name | model_filename }} import {{ model_name }}
+{% endfor %}
+
+__all__ = [
+{% for model_name in models %}
+    "{{ model_name }}",
+{% endfor %}
+]

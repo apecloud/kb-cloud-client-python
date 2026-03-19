@@ -1,0 +1,10 @@
+{% include "partial_header.j2" %}
+{% for api_name in apis %}
+from .{{ api_name | safe_snake_case }}_api import {{ api_name | class_name }}Api
+{% endfor %}
+
+__all__ = [
+{% for api_name in apis %}
+    "{{ api_name | class_name }}Api",
+{% endfor %}
+]

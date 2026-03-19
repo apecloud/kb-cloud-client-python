@@ -1,0 +1,130 @@
+{% include "partial_header.j2" %}
+from __future__ import annotations
+
+import warnings
+from typing import Any, Dict, List, Optional, Union
+
+from {{ package }}.api_client import ApiClient, Endpoint as _Endpoint, UnsetType, unset
+from {{ package }}.configuration import Configuration
+from ..model import *  # noqa: F401, F403
+
+
+class {{ name | class_name }}Api:
+    """{{ name | upperfirst }} API client.
+
+    Provides methods for the {{ name }} endpoints of the KubeBlocks Cloud API.
+    """
+
+    def __init__(self, api_client: Optional[ApiClient] = None):
+        if api_client is None:
+            api_client = ApiClient(Configuration.default())
+        self.api_client = api_client
+
+        # ── Endpoint descriptors ──────────────────────────────────────────────
+{% for path, method, operation in operations | sort(attribute="2.operationId", case_sensitive=True) %}
+{% set op_id = operation.operationId %}
+{% set py_method = op_id | snake_case %}
+{% set return_type = operation | return_type %}
+{% set accept_list = operation | accept_headers %}
+        self._{{ py_method }}_endpoint = _Endpoint(
+            settings={
+                "response_type": {{ return_type if return_type else "None" }},
+                "endpoint_path": "{{ path }}",
+                "http_method": "{{ method.upper() }}",
+                "operation_id": "{{ py_method }}",
+{% if operation.get("deprecated") %}
+                "deprecated": True,
+{% endif %}
+            },
+            params_map={
+{% for pname, parameter in operation | parameters %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+{% set loc = "body" if pname == "body" else parameter.get("in", "query") %}
+                "{{ py_name }}": {
+{% if parameter.required or parameter.get("in") == "path" %}
+                    "required": True,
+{% endif %}
+                    "location": "{{ loc }}",
+{% if loc != "body" %}
+                    "attribute": "{{ pname }}",
+{% endif %}
+{% if parameter | collection_format %}
+                    "collection_format": "{{ parameter | collection_format }}",
+{% endif %}
+                },
+{% endfor %}
+            },
+            headers_map={
+                "accept": [{% for m in accept_list %}"{{ m }}"{% if not loop.last %}, {% endif %}{% endfor %}],
+{% if operation.requestBody %}
+                "content_type": [{% for m in operation.requestBody.content.keys() %}"{{ m }}"{% if not loop.last %}, {% endif %}{% endfor %}],
+{% endif %}
+            },
+            api_client=api_client,
+        )
+{% endfor %}
+
+{% for path, method, operation in operations | sort(attribute="2.operationId", case_sensitive=True) %}
+{% set op_id = operation.operationId %}
+{% set py_method = op_id | snake_case %}
+{% set return_type = operation | return_type %}
+{% set required_params = [] %}
+{% set optional_params = [] %}
+{% for pname, parameter in operation | parameters %}
+{% if parameter.required or parameter.get("in") == "path" %}
+{% set _ = required_params.append((pname, parameter)) %}
+{% else %}
+{% set _ = optional_params.append((pname, parameter)) %}
+{% endif %}
+{% endfor %}
+
+    def {{ py_method }}(
+        self,
+{% for pname, parameter in required_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+        {{ py_name }}: {{ get_type_for_parameter(parameter) }},
+{% endfor %}
+{% if optional_params %}
+        *,
+{% for pname, parameter in optional_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+        {{ py_name }}: Union[{{ get_type_for_parameter(parameter) }}, UnsetType] = unset,
+{% endfor %}
+{% endif %}
+    ) -> {{ return_type if return_type else "None" }}:
+        """{{ operation.get("summary", op_id) }}.
+{% if operation.get("description") %}
+
+        {{ operation.description | replace("\n", "\n        ") | truncate(300) }}
+{% endif %}
+{% for pname, parameter in required_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+{% if parameter.get("description") %}
+        :param {{ py_name }}: {{ parameter.description | replace("\n", " ") | truncate(120) }}
+{% endif %}
+        :type {{ py_name }}: {{ get_type_for_parameter(parameter) }}
+{% endfor %}
+{% for pname, parameter in optional_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+{% if parameter.get("description") %}
+        :param {{ py_name }}: {{ parameter.description | replace("\n", " ") | truncate(120) }}
+{% endif %}
+        :type {{ py_name }}: {{ get_type_for_parameter(parameter) }}, optional
+{% endfor %}
+        :rtype: {{ return_type if return_type else "None" }}
+        """
+{% if operation.get("deprecated") %}
+        warnings.warn("{{ py_method }} is deprecated", DeprecationWarning, stacklevel=2)
+{% endif %}
+        kwargs: Dict[str, Any] = {}
+{% for pname, parameter in required_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+        kwargs["{{ py_name }}"] = {{ py_name }}
+{% endfor %}
+{% for pname, parameter in optional_params %}
+{% set py_name = "body" if pname == "body" else (pname | attribute_name) %}
+        if {{ py_name }} is not unset:
+            kwargs["{{ py_name }}"] = {{ py_name }}
+{% endfor %}
+        return self._{{ py_method }}_endpoint.call_with_http_info(**kwargs)
+{% endfor %}

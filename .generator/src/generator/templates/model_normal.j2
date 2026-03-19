@@ -1,0 +1,61 @@
+{% set required_props = model.get("required", []) %}
+{% set all_props = {} %}
+{% if "allOf" in model %}
+{% for sub in model["allOf"] %}
+{% if sub.get("properties") %}
+{% for prop_name, prop_schema in sub.get("properties", {}).items() %}
+{% set _ = all_props.update({prop_name: prop_schema}) %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% for prop_name, prop_schema in model.get("properties", {}).items() %}
+{% set _ = all_props.update({prop_name: prop_schema}) %}
+{% endfor %}
+
+@dataclass
+class {{ name }}:
+    """{{ model.get("description", name) | replace('"', "'") | truncate(200) }}"""
+{% if not all_props %}
+    pass
+{% else %}
+    # Required fields
+{% for prop_name, prop_schema in all_props.items() %}
+{% if prop_name in required_props %}
+    {{ prop_name | attribute_name }}: {{ type_to_python(prop_schema) }}
+{% endif %}
+{% endfor %}
+    # Optional fields
+{% for prop_name, prop_schema in all_props.items() %}
+{% if prop_name not in required_props %}
+{% set prop_type = type_to_python(prop_schema) %}
+    {{ prop_name | attribute_name }}: Optional[{{ prop_type }}] = None
+{% endif %}
+{% endfor %}
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "{{ name }}":
+        """Deserialize from a dict, recursively converting nested models."""
+        if data is None:
+            return None
+        return cls(
+{% for prop_name, prop_schema in all_props.items() %}
+{% set py_name = prop_name | attribute_name %}
+{% set raw = "data.get(\"" + prop_name + "\")" %}
+            {{ py_name }}={{ prop_schema | deserialize_field(raw) }},
+{% endfor %}
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to a dict, omitting None values."""
+        result: Dict[str, Any] = {}
+{% for prop_name, prop_schema in all_props.items() %}
+{% set py_name = prop_name | attribute_name %}
+        if self.{{ py_name }} is not None:
+            _v = self.{{ py_name }}
+            result["{{ prop_name }}"] = _v.to_dict() if hasattr(_v, "to_dict") else (
+                [i.to_dict() if hasattr(i, "to_dict") else i for i in _v] if isinstance(_v, list) else _v
+            )
+{% endfor %}
+        return result
+{% endif %}
